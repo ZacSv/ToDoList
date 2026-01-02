@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     kotlin("plugin.serialization") version libs.versions.kotlin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -54,10 +55,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Room
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.compose.runtime.livedata)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
@@ -74,6 +77,15 @@ dependencies {
 
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+
+    //Autenticação (Login/Signup)
+    implementation("com.google.firebase:firebase-auth")
+
+    //Firestore (Banco de dados na nuvem)
+    implementation("com.google.firebase:firebase-firestore")
+
 
 
     testImplementation(libs.junit)
