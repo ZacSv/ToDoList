@@ -1,19 +1,20 @@
 package com.example.todolist.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.todolist.ui.feature.addedit.AddEditScreen
+import com.example.todolist.ui.feature.auth.AuthViewModel
 import com.example.todolist.ui.feature.auth.LoginScreen
 import com.example.todolist.ui.feature.auth.SignupScreen
 import com.example.todolist.ui.feature.list.ListScreen
-import com.example.todolist.ui.viewmodel.AuthViewModel
 import kotlinx.serialization.Serializable
 
-// --- DEFINIÇÃO DAS ROTAS ---
+// --- ROTAS ---
 @Serializable
 object LoginRoute
 
@@ -29,19 +30,16 @@ data class AddEditRoute(val id: Long? = null)
 @Composable
 fun TodoNavHost() {
     val navController = rememberNavController()
-
-    // Injetamos o AuthViewModel aqui para compartilhar a mesma instância entre Login e Signup
     val authViewModel: AuthViewModel = hiltViewModel()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Agora o startDestination aponta para um objeto que existe (definido acima)
     NavHost(navController = navController, startDestination = LoginRoute) {
 
-        // --- TELA DE LOGIN ---
+        // --- LOGIN ---
         composable<LoginRoute> {
             LoginScreen(
                 viewModel = authViewModel,
                 navigateToHome = {
-                    // Ao logar, vai para a Lista e remove o Login da pilha (para não voltar com botão "Voltar")
                     navController.navigate(ListRoute) {
                         popUpTo(LoginRoute) { inclusive = true }
                     }
@@ -52,7 +50,7 @@ fun TodoNavHost() {
             )
         }
 
-        // --- TELA DE CADASTRO ---
+        // --- CADASTRO ---
         composable<SignupRoute> {
             SignupScreen(
                 viewModel = authViewModel,
@@ -67,14 +65,25 @@ fun TodoNavHost() {
             )
         }
 
+        // --- LISTA ---
         composable<ListRoute> {
             ListScreen(
                 navigateToAddEditScreen = { id ->
                     navController.navigate(AddEditRoute(id = id))
+                },
+                onLogout = {
+                    keyboardController?.hide()
+
+                    authViewModel.signout()
+
+                    navController.navigate(LoginRoute) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }
 
+        // --- ADICIONAR/EDITAR ---
         composable<AddEditRoute> { backStackEntry ->
             val addEditRoute = backStackEntry.toRoute<AddEditRoute>()
             AddEditScreen(

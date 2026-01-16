@@ -2,30 +2,38 @@ package com.example.todolist.ui.feature.auth
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.todolist.ui.viewmodel.AuthViewModel
-import com.example.todolist.ui.viewmodel.AuthState
+import androidx.lint.kotlin.metadata.Visibility
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel, //Recebe VM
+    viewModel: AuthViewModel,
     navigateToHome: () -> Unit,
     navigateToSignup: () -> Unit
 ) {
-    // A View observa o ViewModel (Padrão MVVM)
     val authState by viewModel.authState.observeAsState()
     val context = LocalContext.current
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // 1. ESTADO PARA CONTROLAR A VISIBILIDADE
+    var passwordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState) {
         when (val state = authState) {
@@ -47,15 +55,35 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") }
+            label = { Text("Email") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it }, // Atualiza o estado local da View
-            label = { Text("Senha") }
+            onValueChange = { password = it },
+            label = { Text("Senha") },
+            // 2. LÓGICA DO OLHINHO:
+            // Se visível -> VisualTransformation.None (Texto puro)
+            // Se oculto -> PasswordVisualTransformation (Bolinhas)
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            // 3. ÍCONE DE CLICAR:
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Filled.Visibility
+                else
+                    Icons.Filled.VisibilityOff
+
+                // Descrição para acessibilidade (leitores de tela)
+                val description = if (passwordVisible) "Esconder senha" else "Mostrar senha"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = description)
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -64,7 +92,14 @@ fun LoginScreen(
             onClick = { viewModel.login(email, password) },
             enabled = authState != AuthState.Loading
         ) {
-            Text(text = "Entrar")
+            if (authState == AuthState.Loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text(text = "Entrar")
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))

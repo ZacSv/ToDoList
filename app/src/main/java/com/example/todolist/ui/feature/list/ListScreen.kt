@@ -1,88 +1,91 @@
 package com.example.todolist.ui.feature.list
-import androidx.compose.animation.core.exponentialDecay
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding // Importante adicionar este
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.todolist.ui.theme.ToDoListTheme
-import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp // Para o ícone de sair
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar // Barra Superior
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel // Import do Hilt
 import com.example.todolist.domain.Todo
 import com.example.todolist.domain.todo1
 import com.example.todolist.domain.todo2
 import com.example.todolist.domain.todo3
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.todolist.data.TodoDatabaseProvider
-import com.example.todolist.data.TodoRepositoryImpl
 import com.example.todolist.navigation.AddEditRoute
 import com.example.todolist.ui.UiEvent
 import com.example.todolist.ui.componentes.TodoItem
-import com.example.todolist.ui.feature.addedit.AddEditViewModel
+import com.example.todolist.ui.theme.ToDoListTheme
 
 @Composable
 fun ListScreen(
     navigateToAddEditScreen: (id: Long?) -> Unit,
+    onLogout: () -> Unit,
+    viewModel: ListViewModel = hiltViewModel()
 ) {
-
-    val context = LocalContext.current.applicationContext
-    val database = TodoDatabaseProvider.provide(context)
-    val repository = TodoRepositoryImpl(dao = database.todoDao)
-    val viewModel = viewModel<ListViewModel>{
-        ListViewModel(repository = repository
-        )
-    }
-
     val todos by viewModel.todos.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { uiEvent ->
             when(uiEvent) {
                 is UiEvent.Navigate<*> -> {
-
                     when(uiEvent.route){
                         is AddEditRoute -> {
                             navigateToAddEditScreen(uiEvent.route.id)
                         }
                     }
-
                 }
-                UiEvent.NavigateBack -> {
-
-                }
-                is UiEvent.ShowSnackbar -> {
-
-                }
+                UiEvent.NavigateBack -> {}
+                is UiEvent.ShowSnackbar -> {}
             }
-
         }
-
     }
-
 
     ListContent(
         todos = todos,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onLogout = onLogout
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListContent(
     todos: List<Todo>,
     onEvent: (ListEvent) -> Unit,
+    onLogout: () -> Unit
 ) {
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Minhas Tarefas") },
+                actions = {
+                    IconButton(onClick = onLogout) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Sair"
+                        )
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 onEvent(ListEvent.AddEdit(null))
@@ -90,10 +93,11 @@ fun ListContent(
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
-    ){  paddingValues ->
+    ){ paddingValues ->
         LazyColumn(
             modifier = Modifier
-                .consumeWindowInsets(paddingValues),
+                .consumeWindowInsets(paddingValues)
+                .padding(paddingValues),
             contentPadding = PaddingValues(16.dp)
         ) {
             itemsIndexed(todos){ index, todo ->
@@ -118,18 +122,14 @@ fun ListContent(
     }
 }
 
-
 @Preview
 @Composable
 private fun ListContentPreview() {
     ToDoListTheme {
         ListContent(
-            todos = listOf(
-                todo1,
-                todo2,
-                todo3,
-            ),
-            onEvent = {}
+            todos = listOf(todo1, todo2, todo3),
+            onEvent = {},
+            onLogout = {}
         )
     }
 }

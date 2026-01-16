@@ -61,6 +61,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.compose.runtime.livedata)
+    implementation(libs.androidx.compose.animation.core.lint)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
@@ -78,6 +79,8 @@ dependencies {
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
 
+    implementation("androidx.compose.material:material-icons-extended")
+
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
     //Autenticação (Login/Signup)
@@ -86,7 +89,8 @@ dependencies {
     //Firestore (Banco de dados na nuvem)
     implementation("com.google.firebase:firebase-firestore")
 
-
+    //Sincronicidade
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     testImplementation(libs.junit)
 

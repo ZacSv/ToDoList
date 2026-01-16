@@ -1,13 +1,15 @@
-package com.example.todolist.ui.viewmodel
+package com.example.todolist.ui.feature.auth
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewModelScope
+import com.example.todolist.data.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// Estados de Autenticação, seguindo padrão do vídeo recomendado
+// Estados de Autenticação
 sealed class AuthState {
     object Authenticated : AuthState()
     object Unauthenticated : AuthState()
@@ -16,9 +18,9 @@ sealed class AuthState {
 }
 
 @HiltViewModel
-class AuthViewModel @Inject constructor() : ViewModel() {
-
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class AuthViewModel @Inject constructor(
+    private val repository: AuthRepository
+) : ViewModel() {
 
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
@@ -28,7 +30,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     }
 
     fun checkAuthStatus() {
-        if (auth.currentUser != null) {
+        if (repository.currentUser != null) {
             _authState.value = AuthState.Authenticated
         } else {
             _authState.value = AuthState.Unauthenticated
@@ -41,14 +43,15 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             return
         }
         _authState.value = AuthState.Loading
-        auth.signInWithEmailAndPassword(email, pass)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _authState.value = AuthState.Authenticated
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message ?: "Erro desconhecido")
-                }
+
+        viewModelScope.launch {
+            val result = repository.login(email, pass)
+            result.onSuccess {
+                _authState.value = AuthState.Authenticated
+            }.onFailure { exception ->
+                _authState.value = AuthState.Error(exception.message ?: "Erro desconhecido")
             }
+        }
     }
 
     fun signup(email: String, pass: String) {
@@ -57,18 +60,22 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             return
         }
         _authState.value = AuthState.Loading
-        auth.createUserWithEmailAndPassword(email, pass)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _authState.value = AuthState.Authenticated
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message ?: "Erro desconhecido")
-                }
+
+        viewModelScope.launch {
+            val result = repository.signup(email, pass)
+            result.onSuccess {
+                _authState.value = AuthState.Authenticated
+            }.onFailure { exception ->
+                _authState.value = AuthState.Error(exception.message ?: "Erro desconhecido")
             }
+        }
     }
 
+    // --- CORREÇÃO AQUI EMBAIXO ---
     fun signout() {
-        auth.signOut()
+        repository.logout()
+        // OBRIGATÓRIO: Avisar a UI que agora estamos deslogados.
+        // Sem isso, a LoginScreen acha que ainda estamos logados e faz o redirect.
         _authState.value = AuthState.Unauthenticated
     }
 }

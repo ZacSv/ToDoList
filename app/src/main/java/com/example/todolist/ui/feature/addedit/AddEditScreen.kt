@@ -19,58 +19,43 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.todolist.data.TodoDatabaseProvider
-import com.example.todolist.data.TodoRepositoryImpl
+import androidx.hilt.navigation.compose.hiltViewModel // <--- Importante: Import do Hilt
 import com.example.todolist.ui.UiEvent
 import com.example.todolist.ui.theme.ToDoListTheme
 
 @Composable
 fun AddEditScreen(
     id: Long?,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    viewModel: AddEditViewModel = hiltViewModel() // <--- A Mágica do Hilt acontece aqui
 ) {
-    val context = LocalContext.current.applicationContext
-    val database = TodoDatabaseProvider.provide(context)
-    val repository = TodoRepositoryImpl(dao = database.todoDao)
-
-    
-    val viewModel = viewModel<AddEditViewModel>{
-        AddEditViewModel(
-            id = id,
-            repository = repository
-            )
-    }
 
     val title = viewModel.tittle
     val description = viewModel.description
 
-    val snackbarHostState = remember{
+    val snackbarHostState = remember {
         SnackbarHostState()
     }
 
-    LaunchedEffect(Unit){
-        viewModel.uiEvent.collect {uiEvent ->
-             when(uiEvent){
-                 is UiEvent.Navigate<*> -> {
-
-                 }
-                 UiEvent.NavigateBack -> {
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiEvent ->
+            when (uiEvent) {
+                is UiEvent.Navigate<*> -> {
+                    // Navegação futura
+                }
+                UiEvent.NavigateBack -> {
                     navigateBack()
-                 }
-                 is UiEvent.ShowSnackbar -> {
-                     snackbarHostState.showSnackbar(
-                         message = uiEvent.message,
-                     )
-                 }
-
-             }
+                }
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = uiEvent.message,
+                    )
+                }
+            }
         }
     }
-
 
     AddEditContent(
         tittle = title,
@@ -87,7 +72,7 @@ fun AddEditContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (AddEditEvent) -> Unit,
 ) {
-    Scaffold (
+    Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -100,10 +85,11 @@ fun AddEditContent(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
-    ){ paddingValues ->
-        Column (
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
                 .consumeWindowInsets(paddingValues)
+                .padding(paddingValues)
                 .padding(16.dp)
         )
         {
@@ -113,7 +99,8 @@ fun AddEditContent(
                 value = tittle,
                 onValueChange = {
                     onEvent(
-                        AddEditEvent.TitleChanged(it))
+                        AddEditEvent.TitleChanged(it)
+                    )
                 },
                 placeholder = {
                     Text(text = "Título")
@@ -148,7 +135,6 @@ private fun AddEditContentPreview() {
             description = null,
             snackbarHostState = SnackbarHostState(),
             onEvent = {},
-
         )
     }
 }
