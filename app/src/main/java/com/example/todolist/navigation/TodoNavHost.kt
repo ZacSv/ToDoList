@@ -12,6 +12,7 @@ import com.example.todolist.ui.feature.auth.AuthViewModel
 import com.example.todolist.ui.feature.auth.LoginScreen
 import com.example.todolist.ui.feature.auth.SignupScreen
 import com.example.todolist.ui.feature.list.ListScreen
+import com.example.todolist.ui.feature.theme.ThemeViewModel
 import kotlinx.serialization.Serializable
 
 // --- ROTAS ---
@@ -28,7 +29,7 @@ object ListRoute
 data class AddEditRoute(val id: Long? = null)
 
 @Composable
-fun TodoNavHost() {
+fun TodoNavHost(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = hiltViewModel()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -79,7 +80,8 @@ fun TodoNavHost() {
                     navController.navigate(LoginRoute) {
                         popUpTo(0) { inclusive = true }
                     }
-                }
+                },
+                themeViewModel = themeViewModel
             )
         }
 
@@ -88,9 +90,17 @@ fun TodoNavHost() {
             val addEditRoute = backStackEntry.toRoute<AddEditRoute>()
             AddEditScreen(
                 id = addEditRoute.id,
-                navigateBack = {
-                    navController.popBackStack()
+                navigateBack = { navController.popBackStack() },
+                onLogout = {
+                    keyboardController?.hide()
+
+                    authViewModel.signout()
+
+                    navController.navigate(LoginRoute) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 },
+                themeViewModel = themeViewModel
             )
         }
     }

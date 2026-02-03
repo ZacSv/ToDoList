@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ListViewModel @Inject constructor( // @Inject constructor antes dos parênteses
+class ListViewModel @Inject constructor(
+    // @Inject constructor antes dos parênteses
     private val repository: TodoRepository,
 ) : ViewModel() {
 
@@ -51,13 +52,27 @@ class ListViewModel @Inject constructor( // @Inject constructor antes dos parên
 
     private fun delete(id: Long) {
         viewModelScope.launch {
-            repository.delete(id)
+            try {
+                repository.delete(id)
+                _uiEvent.send(UiEvent.ShowSnackbar("Tarefa excluída com sucesso!"))
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowSnackbar("Erro ao excluir: ${e.message}"))
+            }
         }
     }
 
     private fun completeChanged(id: Long, isCompleted: Boolean) {
         viewModelScope.launch {
-            repository.updateCompleted(id, isCompleted)
+            try {
+                repository.updateCompleted(id, isCompleted)
+                val message = if (isCompleted) {
+                    "Tarefa marcada como concluída!"
+                } else {
+                    "Tarefa marcada como pendente!"
+                }
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowSnackbar("Erro ao atualizar tarefa: ${e.message}"))
+            }
         }
     }
 }

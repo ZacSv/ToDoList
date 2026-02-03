@@ -45,7 +45,7 @@ class TodoRepositoryImpl(
             entities.map { entity ->
                 Todo(
                     id = entity.id,
-                    tittle = entity.title,
+                    title = entity.title,
                     description = entity.description,
                     isCompleted = entity.isCompleted
                 )
@@ -57,7 +57,7 @@ class TodoRepositoryImpl(
         return dao.getById(id)?.let { entity ->
             Todo(
                 id = entity.id,
-                tittle = entity.title,
+                title = entity.title,
                 description = entity.description,
                 isCompleted = entity.isCompleted
             )

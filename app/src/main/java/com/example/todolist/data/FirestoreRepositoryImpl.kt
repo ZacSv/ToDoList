@@ -91,7 +91,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                         if (id != null && title != null) {
                             Todo(
                                 id = id,
-                                tittle = title,
+                                title = title,
                                 description = desc,
                                 isCompleted = completed
                             )
@@ -111,7 +111,7 @@ class FirestoreRepositoryImpl @Inject constructor(
             if (doc.exists()) {
                 Todo(
                     id = doc.getLong("id")!!,
-                    tittle = doc.getString("title")!!,
+                    title = doc.getString("title")!!,
                     description = doc.getString("description"),
                     isCompleted = doc.getBoolean("isCompleted") ?: false
                 )

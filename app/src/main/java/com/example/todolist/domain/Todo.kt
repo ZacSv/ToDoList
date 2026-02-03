@@ -1,8 +1,8 @@
 package com.example.todolist.domain
 
-data class Todo (
+data class Todo(
     val id: Long,
-    val tittle: String,
+    val title: String,
     val description: String?,
     val isCompleted: Boolean,
 
@@ -12,21 +12,21 @@ data class Todo (
 //Fake Objects
 val todo1 = Todo(
     id = 1,
-    tittle = "Teste 1",
+    title = "Teste 1",
     description = "Colocar lixo para fora",
     isCompleted = false,
 )
 
 val todo2 = Todo(
     id = 2,
-    tittle = "Teste 2",
+    title = "Teste 2",
     description = "Lavar a louça",
-    isCompleted =  true,
+    isCompleted = true,
 )
 
 val todo3 = Todo(
     id = 3,
-    tittle = "Teste 3",
+    title = "Teste 3",
     description = "Lavar a roupa",
     isCompleted = false,
 )

@@ -9,35 +9,49 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+/** Gemini 3 (Rápido) - início
+ *
+ * Baseado na imagem anexada, extraia a paleta de cores
+ * e crie um tema personalizado para um projeto Android
+ * utilizando Jetpack Compose e Material Design 3
+ *
+ */
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = OrangePrimary,
+    onPrimary = Color.White,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = OrangeSecondary,
+    background = DarkBackground,
+    surface = DarkSurface,
+    onBackground = DarkOnSurface,
+    onSurface = DarkOnSurface,
+    onSurfaceVariant = Color(0xFFBDBDBD)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = OrangePrimary,
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primaryContainer = Color(0xFFFFEBE6),
+    onPrimaryContainer = OrangePrimary,
+    /** William Damascena - início
+     * razão: Gemini trocou a referências das cores de background e surface
+     */
+    background = LightSurface,
+    surface = LightBackground,
+    /** William Damascena - início*/
+    onBackground = LightOnSurface,
+    onSurface = LightOnSurface,
+    onSurfaceVariant = Color(0xFF757575)
 )
 
 @Composable
 fun ToDoListTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -56,3 +70,5 @@ fun ToDoListTheme(
         content = content
     )
 }
+
+/** Gemini 3 (Rápido) - início*/

@@ -25,7 +25,7 @@ class AddEditViewModel @Inject constructor(
     //Recupera o ID automaticamente usando a rota definida
     private val todoId: Long? = savedStateHandle.toRoute<AddEditRoute>().id
 
-    var tittle by mutableStateOf("")
+    var title by mutableStateOf("")
         private set
     var description by mutableStateOf<String?>("")
         private set
@@ -38,7 +38,7 @@ class AddEditViewModel @Inject constructor(
         todoId?.let { id ->
             viewModelScope.launch {
                 val todo = repository.getById(id)
-                tittle = todo?.tittle ?: ""
+                title = todo?.title ?: ""
                 description = todo?.description
             }
         }
@@ -47,11 +47,13 @@ class AddEditViewModel @Inject constructor(
     fun onEvent(event: AddEditEvent) {
         when (event) {
             is AddEditEvent.TitleChanged -> {
-                tittle = event.title
+                title = event.title
             }
+
             is AddEditEvent.DescriptionChanged -> {
                 description = event.description
             }
+
             is AddEditEvent.Save -> {
                 save()
             }
@@ -60,16 +62,29 @@ class AddEditViewModel @Inject constructor(
 
     private fun save() {
         viewModelScope.launch {
-            if (tittle.isBlank()) {
+            if (title.isBlank()) {
                 _uiEvent.send(UiEvent.ShowSnackbar("O título não pode estar vazio"))
                 return@launch
             }
 
-            // Salva no Firestore
-            repository.insert(tittle, description, todoId)
+            try {
+                // Salva no Firestore
+                repository.insert(title, description, todoId)
 
-            // Volta para a tela anterior
-            _uiEvent.send(UiEvent.NavigateBack)
+                /*val message = if (todoId == null) {
+                    "Tarefa criada com sucesso"
+                } else {
+                    "Tarefa atualizada com sucesso"
+                }
+                _uiEvent.send(UiEvent.ShowSnackbar(message))
+
+                kotlinx.coroutines.delay(300)*/
+
+                // Volta para a tela anterior
+                _uiEvent.send(UiEvent.NavigateBack)
+            } catch (e: Exception) {
+                _uiEvent.send(UiEvent.ShowSnackbar("Erro ao salvar tarefa: ${e.message}"))
+            }
         }
     }
 }
