@@ -67,6 +67,14 @@ fun SignupScreen(
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(0.8f),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.surface,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    errorContainerColor = MaterialTheme.colorScheme.surface
+                ),
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
@@ -80,6 +88,14 @@ fun SignupScreen(
             // --- CAMPO DE SENHA ---
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(0.8f),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.surface,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    errorContainerColor = MaterialTheme.colorScheme.surface
+                ),
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Senha") },

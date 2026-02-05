@@ -39,8 +39,8 @@ private val LightColorScheme = lightColorScheme(
     /** William Damascena - início
      * razão: Gemini trocou a referências das cores de background e surface
      */
-    background = LightSurface,
-    surface = LightBackground,
+    surface = LightSurface,
+    background = LightBackground,
     /** William Damascena - início*/
     onBackground = LightOnSurface,
     onSurface = LightOnSurface,
