@@ -57,6 +57,14 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
+    /* GEMINI PRO - START
+     Prompt:
+     I'm evolving my ToDoList app and now I need the to-do list to update automatically whenever something changes in Firestore (without me having to refresh).
+     I know Firestore has the addSnapshotListener, but I want to expose this data to my UI using Kotlin Flow, to keep it modern with Jetpack Compose.
+     I have two challenges:
+     How do I transform this Firebase listener into a Flow? callbackFlow is the best option, but I don't know how to close the channel or remove the listener afterward to avoid memory leaks.
+     I noticed that if the user logs out while the list screen is open, the app crashes! I think it's because the listener keeps trying to read the data, but Firebase denies access because there's no longer a logged-in user.
+     Create a getAll() function that returns a Flow<List<Todo>>, handle this permission denied error on logout silently, and map the Firebase documentation to my Todo class?*/
     override fun getAll(): Flow<List<Todo>> {
         val collection = getTodosCollection()
 
@@ -103,6 +111,8 @@ class FirestoreRepositoryImpl @Inject constructor(
             awaitClose { subscription.remove() }
         }
     }
+
+    /* GEMINI PRO - END  2 */
 
     override suspend fun getById(id: Long): Todo? {
         val collection = getTodosCollection() ?: return null

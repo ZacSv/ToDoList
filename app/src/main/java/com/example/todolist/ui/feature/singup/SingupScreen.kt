@@ -37,6 +37,12 @@ fun SignupScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    /* GEMINI PRO - START
+     Prompt:
+     I'm finishing the signup screen for my app. I already have a ViewModel that gives me an authState (whether it's loading, if there was an error, or if it authenticated).
+     My problem is: How do I make the app automatically navigate to the 'Home' screen as soon as the state changes to Authenticated?
+     I tried putting an if statement inside the screen, but it tries to navigate multiple times or gives a 'recomposition' error. Also, if there's an error in Firebase, I want to show a Snackbar (that pop-up notification) with the error message from the ViewModel.
+     How do I use LaunchedEffect to 'keep an eye' on the state and only trigger the navigation or the Snackbar once when the state changes? Can you show me how to configure the Scaffold with SnackbarHost to make this work?*/
     LaunchedEffect(authState) {
         when (val state = authState) {
             is AuthState.Authenticated -> navigateToHome()
@@ -53,7 +59,12 @@ fun SignupScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { paddingValues ->
+    )
+
+
+    /* GEMINI PRO - END*/
+
+    { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()

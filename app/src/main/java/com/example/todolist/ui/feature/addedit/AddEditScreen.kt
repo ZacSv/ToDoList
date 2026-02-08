@@ -67,6 +67,13 @@ fun AddEditScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    /* GEMINI PRO - START
+     Prompt:
+     I'm creating an AddEditScreen in my ToDoList app. I already have the text fields saving the state in the ViewModel, but I'm having trouble finalizing the screen.
+     The scenario is: When the user clicks the 'Check' (save) button, the ViewModel does its job in the database. I want that, as soon as the saving is finished, the app displays a notification (Snackbar) and automatically returns to the previous screen.
+     I saw that it's not good to use a 'state' variable (like shouldExit = true) because if the user rotates the screen, the state might trigger navigation again. I was told to use an event Flow in the ViewModel, but how do I 'listen' to this Flow in my Composable in a way that it doesn't miss events if they arrive one after the other?
+     What is collectLatest and why should I use it inside a LaunchedEffect(true) to navigate back?*/
+
     LaunchedEffect(true) {
         viewModel.uiEvent.collectLatest { uiEvent ->
             when (uiEvent) {
@@ -87,7 +94,7 @@ fun AddEditScreen(
             }
         }
     }
-
+    /* GEMINI PRO - END  */
     AddEditContent(
         title = title,
         description = description,

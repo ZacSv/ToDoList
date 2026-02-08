@@ -65,6 +65,11 @@ fun ListScreen(
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    /* GEMINI PRO - START
+     Prompt:
+     I'm organizing my app's architecture and I used a Sealed Class called UiEvent to represent things that happen only once, like navigating to another screen or showing a Snackbar.
+     My problem is: I know that for the to-do list I use collectAsState, but for these navigation events, I don't want them to be part of the screen's 'state', otherwise every time the screen rotates again, it might try to navigate again.
+     How do I make my ListScreen 'listen' for these events coming from the ViewModel (which is a Flow) in a way that I can trigger the navigation or the snackbar (HostState.showSnackbar) as soon as they arrive? I was told it has to be inside a LaunchedEffect, but how do I configure this to collect the events without crashing or losing messages?*/
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
@@ -86,6 +91,8 @@ fun ListScreen(
             }
         }
     }
+
+    /* GEMINI PRO - END */
 
     ListContent(
         todos = todos,

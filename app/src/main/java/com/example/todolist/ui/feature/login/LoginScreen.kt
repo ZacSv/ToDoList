@@ -1,6 +1,5 @@
 package com.example.todolist.ui.feature.auth
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -16,12 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lint.kotlin.metadata.Visibility
-import com.example.todolist.ui.theme.ToDoListTheme
+
 
 @Composable
 fun LoginScreen(
@@ -49,7 +45,6 @@ fun LoginScreen(
                     duration = SnackbarDuration.Short
                 )
             }
-                //Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
     }
@@ -102,8 +97,11 @@ fun LoginScreen(
                 label = { Text("Senha") },
                 singleLine = true,
                 // 2. LÓGICA DO OLHINHO:
-                // Se visível -> VisualTransformation.None (Texto puro)
-                // Se oculto -> PasswordVisualTransformation (Bolinhas)
+                /* GEMINI PRO - START
+                Prompt:
+                I'm trying to create the login function in my repository using Firebase, but it uses a callback.
+                The problem is that this leaves the code 'stuck' inside, and I wanted my function to suspend so I could call it directly in my ViewModel in an asynchronous and clean way. I read that it's possible to 'convert' these callbacks into coroutines, but I don't know how to do that safely.
+                Transform this Firebase signInWithEmailAndPassword method into a function that I can await or something similar, and that returns a Result<Boolean>? Oh, and if the login fails, I need the Firebase exception to come inside this Result so I know what happened.*/
                 visualTransformation = if (passwordVisible)
                     VisualTransformation.None
                 else PasswordVisualTransformation(),
@@ -115,13 +113,14 @@ fun LoginScreen(
                     else
                         Icons.Filled.VisibilityOff
 
-                    // Descrição para acessibilidade (leitores de tela)
+                    //Description for accessibility (screen readers)
                     val description = if (passwordVisible) "Esconder senha" else "Mostrar senha"
 
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = description)
                     }
                 }
+                /* GEMINI PRO - END */
             )
 
             Spacer(modifier = Modifier.height(16.dp))
