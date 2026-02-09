@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TodoRepository {
 
-    suspend fun insert(tittle: String, description: String?, id: Long? = null)
+    suspend fun insert(tittle: String, description: String?, id: Long? = null, isCompleted: Boolean)
 
     suspend fun updateCompleted(id: Long, isCompleted: Boolean)
 

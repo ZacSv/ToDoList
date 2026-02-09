@@ -30,6 +30,9 @@ class AddEditViewModel @Inject constructor(
     var description by mutableStateOf<String?>("")
         private set
 
+    // Armazena o estado atual de completed para não perder ao editar
+    private var currentIsCompleted = false
+
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
@@ -40,6 +43,8 @@ class AddEditViewModel @Inject constructor(
                 val todo = repository.getById(id)
                 title = todo?.title ?: ""
                 description = todo?.description
+                // Carrega o status original da tarefa
+                currentIsCompleted = todo?.isCompleted ?: false
             }
         }
     }
@@ -68,8 +73,7 @@ class AddEditViewModel @Inject constructor(
             }
 
             try {
-                // Salva no Firestore
-                repository.insert(title, description, todoId)
+                repository.insert(title, description, todoId, currentIsCompleted)
 
                 /*val message = if (todoId == null) {
                     "Tarefa criada com sucesso"

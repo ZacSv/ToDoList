@@ -22,16 +22,23 @@ class FirestoreRepositoryImpl @Inject constructor(
         return firestore.collection("users").document(uid).collection("todos")
     }
 
-    override suspend fun insert(tittle: String, description: String?, id: Long?) {
+    // AQUI ESTÁ A CORREÇÃO PRINCIPAL
+    override suspend fun insert(tittle: String, description: String?, id: Long?, isCompleted: Boolean) {
         val collection = getTodosCollection() ?: return
+
+        // Se tiver ID usa ele, senão gera um novo baseado no tempo
         val todoId = id ?: System.currentTimeMillis()
+
         val todoMap = hashMapOf(
             "id" to todoId,
             "title" to tittle,
             "description" to description,
-            "isCompleted" to false
+            "isCompleted" to isCompleted // <--- AGORA USA O VALOR CORRETO (VEIO DA TELA)
         )
+
         try {
+            // O .set() substitui o documento. Como estamos passando todos os campos atualizados,
+            // isso funciona tanto para criar quanto para editar, mantendo o status correto.
             collection.document(todoId.toString()).set(todoMap).await()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -119,12 +126,17 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             val doc = collection.document(id.toString()).get().await()
             if (doc.exists()) {
-                Todo(
-                    id = doc.getLong("id")!!,
-                    title = doc.getString("title")!!,
-                    description = doc.getString("description"),
-                    isCompleted = doc.getBoolean("isCompleted") ?: false
-                )
+                val firestoreId = doc.getLong("id")
+                val firestoreTitle = doc.getString("title")
+
+                if (firestoreId != null && firestoreTitle != null) {
+                    Todo(
+                        id = firestoreId,
+                        title = firestoreTitle,
+                        description = doc.getString("description"),
+                        isCompleted = doc.getBoolean("isCompleted") ?: false
+                    )
+                } else null
             } else null
         } catch (e: Exception) {
             null
